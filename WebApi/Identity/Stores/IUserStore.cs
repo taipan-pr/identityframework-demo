@@ -8,7 +8,8 @@ namespace WebApi.Identity.Stores
                                     IQueryableUserStore<UserProfile, Guid>,
                                     IUserPasswordStore<UserProfile, Guid>,
                                     IUserSecurityStampStore<UserProfile, Guid>,
-                                    IUserEmailStore<UserProfile, Guid>
+                                    IUserEmailStore<UserProfile, Guid>,
+                                    IUserClaimStore<UserProfile, Guid>
     {
     }
 }

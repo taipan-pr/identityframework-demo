@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using WebApi.Identity.Managers;
@@ -115,7 +116,7 @@ namespace WebApi.Controllers
 
         [HttpPatch]
         [Route("{id}")]
-        public async Task<HttpResponseMessage> UpdateAsync([FromUri] Guid id, UpdateUserProfile request)
+        public async Task<HttpResponseMessage> UpdateAsync(Guid id, UpdateUserProfile request)
         {
             var user = await this.manager.FindByIdAsync(id);
             if (user == null)
@@ -135,6 +136,40 @@ namespace WebApi.Controllers
             return result.Succeeded
                 ? this.Request.CreateResponse(HttpStatusCode.OK)
                 : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
+        }
+
+        [HttpPost]
+        [Route("{id}/Claims")]
+        public async Task<HttpResponseMessage> AddClaimAsync(Guid id, UserClaim claim)
+        {
+            var user = await this.manager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return this.Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            var result = await this.manager.AddClaimAsync(id, new Claim(claim.Type, claim.Value));
+            return result.Succeeded
+                ? this.Request.CreateResponse(HttpStatusCode.OK)
+                : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
+        }
+
+        [HttpGet]
+        [Route("{id}/Claims")]
+        public async Task<HttpResponseMessage> GetClaimsAsync(Guid id)
+        {
+            var user = await this.manager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return this.Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            var result = await this.manager.GetClaimsAsync(id);
+            return result.Any()
+                ? this.Request.CreateResponse(HttpStatusCode.OK, result.Select(e => new UserClaim
+                {
+                    Type = e.Type,
+                    Value = e.Value
+                }))
+                : this.Request.CreateResponse(HttpStatusCode.NotFound);
         }
     }
 }
