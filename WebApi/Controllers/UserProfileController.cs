@@ -49,25 +49,50 @@ namespace WebApi.Controllers
                 : this.Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        [HttpGet]
+        [Route]
+        public async Task<HttpResponseMessage> GetByEmailAsync([FromUri] string email)
+        {
+            var result = await this.manager.FindByEmailAsync(email);
+            return result == null
+                ? this.Request.CreateResponse(HttpStatusCode.NotFound)
+                : this.Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [HttpGet]
+        [Route]
+        public async Task<HttpResponseMessage> VerifyEmailAsync([FromUri] Guid id, string token)
+        {
+            var result = await this.manager.ConfirmEmailAsync(id, token);
+            return result.Succeeded
+                ? this.Request.CreateResponse(HttpStatusCode.OK)
+                : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
+        }
+
         [HttpPost]
         [Route]
         public async Task<HttpResponseMessage> CreateAsync(CreateUserProfile request)
         {
+            var id = Guid.NewGuid();
             var result = string.IsNullOrWhiteSpace(request.Password)
                 ? await this.manager.CreateAsync(new UserProfile
                 {
-                    Id = Guid.NewGuid(),
+                    Id = id,
                     UserName = request.UserName,
                     FirstName = request.FirstName,
                     LastName = request.LastName
                 })
                 : await this.manager.CreateAsync(new UserProfile
                 {
-                    Id = Guid.NewGuid(),
+                    Id = id,
                     UserName = request.UserName,
                     FirstName = request.FirstName,
                     LastName = request.LastName
                 }, request.Password);
+            if (!result.Succeeded)
+                return this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
+
+            result = await this.manager.SetEmailAsync(id, request.Email);
             return result.Succeeded
                 ? this.Request.CreateResponse(HttpStatusCode.OK)
                 : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
@@ -101,6 +126,12 @@ namespace WebApi.Controllers
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             var result = await this.manager.UpdateAsync(user);
+            if (user.Email != request.Email)
+            {
+                if (!result.Succeeded)
+                    return this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);
+                result = await this.manager.SetEmailAsync(user.Id, request.Email);
+            }
             return result.Succeeded
                 ? this.Request.CreateResponse(HttpStatusCode.OK)
                 : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);

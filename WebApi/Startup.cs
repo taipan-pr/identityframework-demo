@@ -5,6 +5,7 @@ using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.DataProtection;
 using Owin;
 
 [assembly: OwinStartup(typeof(WebApi.Startup))]
@@ -19,6 +20,7 @@ namespace WebApi
             var builder = new ContainerBuilder();
 
             var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>();
+            builder.Register(e => app.GetDataProtectionProvider()).AsImplementedInterfaces();
             builder.RegisterAssemblyModules(referencedAssemblies.ToArray());
             var container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);

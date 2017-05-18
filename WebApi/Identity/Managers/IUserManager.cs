@@ -17,5 +17,9 @@ namespace WebApi.Identity.Managers
         IQueryable<UserProfile> Users { get; }
 
         Task<IdentityResult> CreateAsync(UserProfile user, string password);
+
+        Task<UserProfile> FindByEmailAsync(string email);
+        Task<IdentityResult> SetEmailAsync(Guid userId, string email);
+        Task<IdentityResult> ConfirmEmailAsync(Guid userId, string token);
     }
 }
