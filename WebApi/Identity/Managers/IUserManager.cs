@@ -15,5 +15,7 @@ namespace WebApi.Identity.Managers
         Task<IdentityResult> UpdateAsync(UserProfile user);
 
         IQueryable<UserProfile> Users { get; }
+
+        Task<IdentityResult> CreateAsync(UserProfile user, string password);
     }
 }

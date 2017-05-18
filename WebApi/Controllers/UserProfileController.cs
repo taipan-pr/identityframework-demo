@@ -53,13 +53,21 @@ namespace WebApi.Controllers
         [Route]
         public async Task<HttpResponseMessage> CreateAsync(CreateUserProfile request)
         {
-            var result = await this.manager.CreateAsync(new UserProfile
-            {
-                Id = Guid.NewGuid(),
-                UserName = request.UserName,
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            });
+            var result = string.IsNullOrWhiteSpace(request.Password)
+                ? await this.manager.CreateAsync(new UserProfile
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = request.UserName,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName
+                })
+                : await this.manager.CreateAsync(new UserProfile
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = request.UserName,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName
+                }, request.Password);
             return result.Succeeded
                 ? this.Request.CreateResponse(HttpStatusCode.OK)
                 : this.Request.CreateResponse(HttpStatusCode.BadRequest, result.Errors);

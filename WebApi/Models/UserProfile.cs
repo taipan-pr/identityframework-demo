@@ -12,5 +12,8 @@ namespace WebApi.Models
         // Customize user's profile data
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        // UserPasswordStore
+        public string Password { get; set; }
     }
 }
