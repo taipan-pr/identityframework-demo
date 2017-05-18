@@ -9,7 +9,7 @@ using WebApi.Models;
 
 namespace WebApi.Identity.Stores
 {
-    internal class UserStore : IUserStore
+    internal partial class UserStore : IUserStore
     {
         private readonly string filePath;
         private IList<UserProfile> users;

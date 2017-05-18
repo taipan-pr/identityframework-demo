@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,6 +17,16 @@ namespace WebApi.Controllers
         public UserProfileController(IUserManager manager)
         {
             this.manager = manager;
+        }
+
+        [HttpGet]
+        [Route]
+        public HttpResponseMessage GetAsync()
+        {
+            var result = this.manager.Users.ToList();
+            return result.Any()
+                ? this.Request.CreateResponse(HttpStatusCode.OK, result)
+                : this.Request.CreateResponse(HttpStatusCode.NotFound);
         }
 
         [HttpGet]

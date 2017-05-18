@@ -4,7 +4,8 @@ using WebApi.Models;
 
 namespace WebApi.Identity.Stores
 {
-    internal interface IUserStore : IUserStore<UserProfile, Guid>
+    internal interface IUserStore : IUserStore<UserProfile, Guid>,
+                                    IQueryableUserStore<UserProfile, Guid>
     {
     }
 }
