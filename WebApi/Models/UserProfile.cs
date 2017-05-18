@@ -15,5 +15,8 @@ namespace WebApi.Models
 
         // UserPasswordStore
         public string Password { get; set; }
+
+        // UserSecurityStampStore
+        public string SecurityStamp { get; set; }
     }
 }

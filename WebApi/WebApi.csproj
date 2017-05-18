@@ -123,6 +123,7 @@
     <Compile Include="Identity\Stores\IUserStore.cs" />
     <Compile Include="Identity\Stores\UserPasswordStore.cs" />
     <Compile Include="Identity\Stores\QueryableUserStore.cs" />
+    <Compile Include="Identity\Stores\UserSecurityStampStore.cs" />
     <Compile Include="Identity\Stores\UserStore.cs" />
     <Compile Include="Models\UpdateUserProfile.cs" />
     <Compile Include="Models\CreateUserProfile.cs" />
