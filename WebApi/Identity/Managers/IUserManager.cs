@@ -26,5 +26,7 @@ namespace WebApi.Identity.Managers
 
         Task<IList<Claim>> GetClaimsAsync(Guid userId);
         Task<IdentityResult> AddClaimAsync(Guid userId, Claim claim);
+
+        Task<bool> CheckPasswordAsync(UserProfile user, string password);
     }
 }

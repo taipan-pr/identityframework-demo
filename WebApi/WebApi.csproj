@@ -132,7 +132,10 @@
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Identity\Managers\IUserManager.cs" />
     <Compile Include="Identity\Managers\UserManager.cs" />
+    <Compile Include="Identity\Providers\AuthenticationProvider.cs" />
+    <Compile Include="Identity\Providers\AuthorizationServerProvider.cs" />
     <Compile Include="Identity\Providers\EmailService.cs" />
+    <Compile Include="Identity\Providers\OwinContextExtensions.cs" />
     <Compile Include="Identity\Stores\IUserStore.cs" />
     <Compile Include="Identity\Stores\UserClaimStore.cs" />
     <Compile Include="Identity\Stores\UserEmailStore.cs" />

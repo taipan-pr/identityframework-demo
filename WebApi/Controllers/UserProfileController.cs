@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.Owin;
 using WebApi.Identity.Managers;
 using WebApi.Models;
 
@@ -14,10 +15,12 @@ namespace WebApi.Controllers
     public class UserProfileController : ApiController
     {
         private readonly IUserManager manager;
+        private readonly IOwinContext owinContext;
 
-        public UserProfileController(IUserManager manager)
+        public UserProfileController(IUserManager manager, IOwinContext owinContext)
         {
             this.manager = manager;
+            this.owinContext = owinContext;
         }
 
         [HttpGet]
@@ -159,9 +162,7 @@ namespace WebApi.Controllers
         {
             var user = await this.manager.FindByIdAsync(id);
             if (user == null)
-            {
                 return this.Request.CreateResponse(HttpStatusCode.NotFound);
-            }
             var result = await this.manager.GetClaimsAsync(id);
             return result.Any()
                 ? this.Request.CreateResponse(HttpStatusCode.OK, result.Select(e => new UserClaim
@@ -169,6 +170,30 @@ namespace WebApi.Controllers
                     Type = e.Type,
                     Value = e.Value
                 }))
+                : this.Request.CreateResponse(HttpStatusCode.NotFound);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("Claims")]
+        public async Task<HttpResponseMessage> GetClaimsAsync()
+        {
+            var userId = this.owinContext.Authentication.User.Claims.FirstOrDefault(e => e.Type == ClaimTypes.NameIdentifier)?.Value;
+            if(string.IsNullOrWhiteSpace(userId) || !Guid.TryParse(userId, out Guid id))
+                return this.Request.CreateResponse(HttpStatusCode.NotFound);
+
+            var user = await this.manager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return this.Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            var claims = this.owinContext.Authentication.User.Claims.Select(e => new UserClaim
+            {
+                Type = e.Type,
+                Value = e.Value
+            }).ToList();
+            return claims.Any()
+                ? this.Request.CreateResponse(HttpStatusCode.OK, claims)
                 : this.Request.CreateResponse(HttpStatusCode.NotFound);
         }
     }
